@@ -19,7 +19,7 @@ ancho1 = 7
 inicio2 = 19
 alto2 = 5
 ancho2 = 7
-V0 = 25  # Velocidad inicial
+V0 = 0.3  # Velocidad inicial
 
 u = np.zeros((Nxmax, Nymax), float)
 w = np.zeros((Nxmax, Nymax), float)
@@ -28,11 +28,12 @@ bu = np.zeros(Nxmax * Nymax)
 bw = np.zeros(Nxmax * Nymax)
 
 for i in range(Nxmax * Nymax):
-  bu[i] = h/8
-  bw[i] = h/8
+    bu[i] = h / 8
+    bw[i] = h / 8
 
-xu0 = np.zeros(Nxmax*Nymax)
-xw0 = np.zeros(Nxmax*Nymax)
+xu0 = np.zeros(Nxmax * Nymax)
+xw0 = np.zeros(Nxmax * Nymax)
+
 
 def Mostrar(m):
     print("La matriz es la siguiente:")
@@ -41,6 +42,7 @@ def Mostrar(m):
             print("\t", valor, end=" ")
         print()
 
+
 def inicializar():
     for i in range(Nxmax):
         V = 0.3
@@ -48,9 +50,17 @@ def inicializar():
             u[i, j] = round(V - 0.001, 3)
             V = V - 0.001
 
+
 inicializar()
 
-def gen_matriz_sis_lineal(n,u,w,h,tipo):
+def rellenar(m1, m2):
+    for i in range(Nxmax - alto1, Nxmax):
+        for j in range(inicio, inicio + ancho1):
+            m1[i, j] = 0
+
+# rellenar(u, w)
+
+def gen_matriz_sis_lineal(n, u, w, h, tipo):
     a = 0
     b = 0
     c = 0
@@ -59,16 +69,16 @@ def gen_matriz_sis_lineal(n,u,w,h,tipo):
     for i in range(1, (n ** 2) + 1):
         fila = []
         for j in range(1, (n ** 2) + 1):
-            if (tipo==1):
-                a = (h / 8) * u[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                b = -(h / 8) * u[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                c = (h / 8) * w[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                d = -(h / 8) * w[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
+            if (tipo == 1):
+                a = (h / 8) * u[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                b = -(h / 8) * u[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                c = (h / 8) * w[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                d = -(h / 8) * w[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
             else:
-                a = (h / 8) * w[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                b = -(h / 8) * w[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                c = (h / 8) * u[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
-                d = -(h / 8) * u[math.ceil(i/n) - 1, math.ceil(j/n) - 1] - 1 / 4
+                a = (h / 8) * w[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                b = -(h / 8) * w[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                c = (h / 8) * u[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
+                d = -(h / 8) * u[math.ceil(i / n) - 1, math.ceil(j / n) - 1] - 1 / 4
             # Primera diagonal
             if (i == j):
                 fila.append(1)
@@ -166,23 +176,45 @@ def outlet(m, b, flag):
 
     return m, b
 
-def centerLine(m,b,flag):
-  n=len(u)
-  for i in range(n*n-n,n*n):
-    b[i] = 0
-    for j in range(0,n*n):
-      m[i][j] = 0
-      if i == j:
-        m[i][j] = 1
-  return m,b
+def centerLine(m, b, flag):
+    n = len(u)
+    for i in range(n * n - n, n * n):
+        b[i] = 0
+        for j in range(0, n * n):
+            m[i][j] = 0
+            if i == j:
+                m[i][j] = 1
+    return m, b
 
-def richardson(A,x,b,N):
+def viga1(m, b, flag):
+    n = len(u)
+    for i in range(n - alto1, n):
+        for j in range(0, n * n):
+            if flag == "u":
+                b[i * n + inicio - 1] = 0
+            else:
+                j2 = math.ceil(j / Nymax) - 1
+                b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
 
-  for i in range(N):
-    r=b-np.dot(A,x)
-    x = x + r
+    if flag == "u":
+        for i in range(n - alto1, n):
+            for j in range(0, n * n):
+                m[i * n + inicio - 1][j] = 0
+                if i * n + inicio == j:
+                    m[i * n + inicio][j] = 1
+    else:
+        for i in range(n - alto1, n):
+            for j in range(0, n * n):
+                m[i * n + inicio - 1][j] = 0
+                if i * n + inicio == j:
+                    m[i * n + inicio][j] = 1
 
-  return x
+def richardson(A, x, b, N):
+    for i in range(N):
+        r = b - np.dot(A, x)
+        x = x + r
+
+    return x
 
 uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
 wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
@@ -194,9 +226,11 @@ outlet(uJac, bu, "u")
 outlet(wJac, bw, "w")
 centerLine(uJac, bu, "u")
 centerLine(wJac, bw, "w")
-# Mostrar(uJac)
-# Mostrar(wJac)
-for i in range(1):
+viga1(uJac, bu, "u")
+viga1(wJac, bw, "w")
+# Mostrar(u)
+# Mostrar(w)
+for i in range(0):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -208,8 +242,9 @@ for i in range(1):
     uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
     wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
 
-# Mostrar(u)
-# Mostrar(w)
+
+Mostrar(u)
+Mostrar(w)
 
 ##############################################################
 # Normalizamos las matrices halladas
@@ -220,6 +255,7 @@ def normalizar():
             if (m != 0):
                 u[i][j] = u[i][j] / m
                 w[i][j] = w[i][j] / m
+
 
 # normalizar()
 
@@ -250,4 +286,3 @@ plt.imshow(magn)
 plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.colorbar()
 plt.show()
-
