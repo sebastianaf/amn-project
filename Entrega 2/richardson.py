@@ -7,7 +7,7 @@ from numpy import array, zeros, diag, diagflat, dot
 # Valores temporalmente por defecto
 # Distancia entre puntos
 h = 1
-omega=0.00001
+omega = 0.00001
 # Dimensiones de la matriz
 Nxmax = 25
 Nymax = 25
@@ -109,6 +109,8 @@ def surfaceG(m, b, flag):
         for j in range(0, n * n):
             # print(f'{i},{j}')
             m[i][j] = 0
+            if i == j:
+                m[i][j] = 1
     if flag == "u":
         for i in range(0, n):
             for j in range(0, n * n):
@@ -128,6 +130,8 @@ def InletF(m, b, flag):
             b[i] = 0
         for j in range(0, n * n):
             m[i][j] = 0
+            if i == j:
+                m[i][j] = 1
     if flag == "u":
         for i in range(0, n * n, n):
             for j in range(0, n * n):
@@ -150,6 +154,8 @@ def outlet(m, b, flag):
         b[i] = 0
         for j in range(0, n * n):
             m[i][j] = 0
+            if i == j:
+                m[i][j] = 1
 
     for i in range(n - 1, n * n, n):
         for j in range(0, n * n):
@@ -160,34 +166,39 @@ def outlet(m, b, flag):
 
     return m, b
 
+def centerLine(m,b,flag):
+  n=len(u)
+  for i in range(n*n-n,n*n):
+    b[i] = 0
+    for j in range(0,n*n):
+      m[i][j] = 0
+      if i == j:
+        m[i][j] = 1
+  return m,b
 
-def centerLine(m, b, flag):
-    n = len(u)
-    for i in range(n * n - n, n * n):
-        b[i] = 0
-        for j in range(0, n * n):
-            m[i][j] = 0
-    return m, b
+def richardson(A,x,b,N):
 
-def jacobi(A,x,b,N):
-    if x is None:
-        x = np.ones(len(A[0]))
+  for i in range(N):
+    r=b-np.dot(A,x)
+    x = x + r
 
-    D = diag(A)
-    R = A - diagflat(D)
-
-    for i in range(N):
-        x = (b - dot(R,x)) / D
-    return x
+  return x
 
 uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
 wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
+surfaceG(uJac, bu, "u")
+surfaceG(wJac, bw, "w")
+InletF(uJac, bu, "u")
+InletF(wJac, bw, "w")
+outlet(uJac, bu, "u")
+outlet(wJac, bw, "w")
+centerLine(uJac, bu, "u")
+centerLine(wJac, bw, "w")
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(50):
-
-    xu0 = jacobi(uJac, xu0, bu, 1)
-    xw0 = jacobi(wJac, xw0, bw, 1)
+for i in range(1):
+    xu0 = richardson(uJac, xu0, bu, 1)
+    xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
     for i in range(0, Nxmax):
         for j in range(0, Nymax):
@@ -239,3 +250,4 @@ plt.imshow(magn)
 plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.colorbar()
 plt.show()
+
