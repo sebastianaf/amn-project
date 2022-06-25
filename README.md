@@ -1,10 +1,15 @@
 # Proyecto Análisis y Métodos Numéricos
 
 ## Versión 1.0.0
-Codigo actual, sin vigas
+Codigo base
+    - **Entrega 1:** No culminada, no es necesario revisarla aún
+    - **Entrega 2:** En ejecución, sólo se está implementando Richardson, Jocabi se hará luego de Richardson
 
-## Version 1.1.0
-Código actual, sin vigas
+## Versión 1.0.1
+Se cambio la velocidad inicial, la cual estaba generando errores (V0 = 25 -> V0 = 0.3).
 
-## Version 1.1.1
-Se añade el readme
+
+
+# Nota:
+    - **Problema actual:** Al parecer el codigo no esta reconociendo las fronteras actualmente implementadas
+    - Se trato de iniciar con una viga, pero primero e debe corregir lo anterior
