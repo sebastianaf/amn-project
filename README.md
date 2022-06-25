@@ -8,8 +8,9 @@ Codigo base
 ## Versión 1.0.1
 Se cambio la velocidad inicial, la cual estaba generando errores (V0 = 25 -> V0 = 0.3).
 
-
+## Versión 1.0.2
+Se ha disminuido el omega, para que la convergencia se amas rápida.
+Las fronteras fueron puestas dentro del bucle que calcula las iteraciones de Richardson
 
 # Nota:
-    - **Problema actual:** Al parecer el codigo no esta reconociendo las fronteras actualmente implementadas
-    - Se trato de iniciar con una viga, pero primero e debe corregir lo anterior
+    - La viga implementada es sólo la pared izquierda de la vga inferior

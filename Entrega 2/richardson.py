@@ -7,7 +7,7 @@ from numpy import array, zeros, diag, diagflat, dot
 # Valores temporalmente por defecto
 # Distancia entre puntos
 h = 1
-omega = 0.00001
+omega = 0.001
 # Dimensiones de la matriz
 Nxmax = 25
 Nymax = 25
@@ -218,19 +218,23 @@ def richardson(A, x, b, N):
 
 uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
 wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
-surfaceG(uJac, bu, "u")
-surfaceG(wJac, bw, "w")
-InletF(uJac, bu, "u")
-InletF(wJac, bw, "w")
-outlet(uJac, bu, "u")
-outlet(wJac, bw, "w")
-centerLine(uJac, bu, "u")
-centerLine(wJac, bw, "w")
-viga1(uJac, bu, "u")
-viga1(wJac, bw, "w")
+
+def condiciones():
+    surfaceG(uJac, bu, "u")
+    surfaceG(wJac, bw, "w")
+    InletF(uJac, bu, "u")
+    InletF(wJac, bw, "w")
+    outlet(uJac, bu, "u")
+    outlet(wJac, bw, "w")
+    centerLine(uJac, bu, "u")
+    centerLine(wJac, bw, "w")
+    viga1(uJac, bu, "u")
+    viga1(wJac, bw, "w")
+
+condiciones()
 # Mostrar(u)
 # Mostrar(w)
-for i in range(0):
+for i in range(1):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -241,10 +245,21 @@ for i in range(0):
             it += 1
     uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
     wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
+    condiciones()
 
 
-Mostrar(u)
-Mostrar(w)
+# Mostrar(u)
+# Mostrar(w)
+
+#############################################################
+# Matriz de magnitudes
+
+magn = np.zeros((Nxmax, Nxmax))
+
+for j in range(Nxmax):
+    for i in range(Nxmax):
+        a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
+        magn[i][j] = a
 
 ##############################################################
 # Normalizamos las matrices halladas
@@ -257,17 +272,7 @@ def normalizar():
                 w[i][j] = w[i][j] / m
 
 
-# normalizar()
-
-#############################################################
-# Matriz de magnitudes
-
-magn = np.zeros((Nxmax, Nxmax))
-
-for j in range(Nxmax):
-    for i in range(Nxmax):
-        a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
-        magn[i][j] = a
+normalizar()
 
 ##############################################################
 # Vectores
@@ -283,6 +288,15 @@ vmesh = w
 #####################################################
 # Graficar
 plt.imshow(magn)
-plt.quiver(xmesh, ymesh, umesh, vmesh)
+plt.quiver(umesh, vmesh, angles='xy', scale_units='xy', scale=1)
 plt.colorbar()
 plt.show()
+
+#ax = plt.axes()
+#ax.arrow(1,2, 5,5 , head_width=0.5, head_length=0.5)
+# print(u[10,10])
+# print(w[10,10])
+# plt.quiver([u[10,10]], [w[10,10]], angles='xy', scale_units='xy', scale=1)
+# plt.ylim(0,10)
+# plt.xlim(0,10)
+# plt.show()
