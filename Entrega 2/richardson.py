@@ -56,7 +56,7 @@ def rellenar(m1, m2):
         for j in range(inicio, inicio + ancho1):
             m1[i, j] = 0
 
-rellenar(u, w)
+# rellenar(u, w)
 
 def gen_matriz_sis_lineal(n,u,w,h,tipo):
     a = 0
@@ -184,8 +184,15 @@ def centerLine(m,b,flag):
         m[i][j] = 1
   return m,b
 
+def transformPairToOne(i, j):
+    return (i+1) * Nxmax - (Nxmax - j)
+
+def transform(j):
+    return j%Nxmax
+
 def viga1(m, b, flag):
     n = len(u)
+    # Pared izquierda viga 1
     for i in range(n - alto1, n):
         for j in range(0, n * n):
             if flag == "u":
@@ -193,19 +200,45 @@ def viga1(m, b, flag):
             else:
                 j2 = math.ceil(j / Nymax) - 1
                 b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+    # Pared superior viga 1
+    f = n - alto1 - 1
+    for j in range(inicio, inicio + ancho1):
+        if flag == "u":
+            b[transformPairToOne(f, j)] = 0
+        else:
+            j2 = math.ceil(j / Nymax) - 1
+            b[transformPairToOne(f, j)] = -2 * (u[i - 1][j2] - u[i][j2]) / h * h
 
     if flag == "u":
+        # Pared izquierda viga 1
         for i in range(n - alto1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
                     m[i * n + inicio - 1][j] = 1
+        # Pared superior viga 1
+        f = n - alto1 - 1
+        for j in range(inicio, inicio + ancho1):
+            for k in range(0, n * n):
+                m[transformPairToOne(f, j)][k] = 0
+                if transformPairToOne(f, j) == k:
+                    m[transformPairToOne(f, j)][k] = 1
+
     else:
+        # Pared izquierda viga 1
         for i in range(n - alto1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
                     m[i * n + inicio - 1][j] = 1
+
+        # Pared superior viga 1
+        f = n - alto1 - 1
+        for j in range(inicio, inicio + ancho1):
+            for k in range(0, n * n):
+                m[transformPairToOne(f, j)][k] = 0
+                if transformPairToOne(f, j) == k:
+                    m[transformPairToOne(f, j)][k] = 1
 
 def richardson(A,x,b,N):
 

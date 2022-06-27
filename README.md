@@ -15,5 +15,5 @@ Las fronteras fueron puestas dentro del bucle que calcula las iteraciones de Ric
 ## Versión 1.0.3
 Los omega se dividiero en dos, hay un omega para cada matriz. Esto se hace para acelerar la convergencia de y, ya que suma valores extremadamente pequeños.
 
-# Nota:
-    - La viga implementada es sólo la pared izquierda de la viga inferior
+## Versión 1.0.4
+Es esta implementando la viga 1. Está terminada la pared izquierda y la superior.
