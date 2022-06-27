@@ -12,5 +12,8 @@ Se cambio la velocidad inicial, la cual estaba generando errores (V0 = 25 -> V0 
 Se ha disminuido el omega, para que la convergencia se amas rápida.
 Las fronteras fueron puestas dentro del bucle que calcula las iteraciones de Richardson
 
+## Versión 1.0.3
+Los omega se dividiero en dos, hay un omega para cada matriz. Esto se hace para acelerar la convergencia de y, ya que suma valores extremadamente pequeños.
+
 # Nota:
-    - La viga implementada es sólo la pared izquierda de la vga inferior
+    - La viga implementada es sólo la pared izquierda de la viga inferior
