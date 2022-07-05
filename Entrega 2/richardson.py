@@ -56,7 +56,7 @@ def rellenar(m1, m2):
         for j in range(inicio, inicio + ancho1):
             m1[i, j] = 0
 
-# rellenar(u, w)
+rellenar(u, w)
 
 def gen_matriz_sis_lineal(n,u,w,h,tipo):
     a = 0
@@ -190,8 +190,24 @@ def transformPairToOne(i, j):
 def transform(j):
     return j%Nxmax
 
+def llenar(m, b, flag):
+    n = len(u)
+    # Rellenar
+    for i in range(Nxmax - alto1, Nxmax):
+        for k in range(inicio, inicio + ancho1):
+            for j in range(0, n * n):
+                j2 = math.ceil(j / Nymax) - 1
+                m[transformPairToOne(i, k)][j] = 0
+                if transformPairToOne(i, k) == j:
+                    m[transformPairToOne(i, k)][j] = 1
+
+    for i in range(Nxmax - alto1, Nxmax):
+        for k in range(inicio, inicio + ancho1):
+            b[transformPairToOne(i, k)] = 0
+
 def viga1(m, b, flag):
     n = len(u)
+
     # Pared izquierda viga 1
     for i in range(n - alto1, n):
         for j in range(0, n * n):
@@ -208,6 +224,15 @@ def viga1(m, b, flag):
         else:
             j2 = math.ceil(j / Nymax) - 1
             b[transformPairToOne(f, j)] = -2 * (u[i - 1][j2] - u[i][j2]) / h * h
+    # Pared derecha viga 1
+    for i in range(n - alto1, n):
+        for j in range(0, n * n):
+            if flag == "u":
+                b[i * n + inicio + ancho1] = 0
+            else:
+                j2 = math.ceil(j / Nymax) - 1
+                if j2 == inicio + ancho1:
+                    b[i * n + inicio + ancho1] = -2 * (u[i][j2 + 1] - u[i][j2]) / h * h
 
     if flag == "u":
         # Pared izquierda viga 1
@@ -223,7 +248,12 @@ def viga1(m, b, flag):
                 m[transformPairToOne(f, j)][k] = 0
                 if transformPairToOne(f, j) == k:
                     m[transformPairToOne(f, j)][k] = 1
-
+        # Pared derecha viga 1
+        for i in range(n - alto1, n):
+            for j in range(0, n * n):
+                m[i * n + inicio + ancho1][j] = 0
+                if i * n + inicio + ancho1 == j:
+                    m[i * n + inicio + ancho1][j] = 1
     else:
         # Pared izquierda viga 1
         for i in range(n - alto1, n):
@@ -239,6 +269,12 @@ def viga1(m, b, flag):
                 m[transformPairToOne(f, j)][k] = 0
                 if transformPairToOne(f, j) == k:
                     m[transformPairToOne(f, j)][k] = 1
+        # Pared derecha viga 1
+        for i in range(n - alto1, n):
+            for j in range(0, n * n):
+                m[i * n + inicio + ancho1][j] = 0
+                if i * n + inicio + ancho1 == j:
+                    m[i * n + inicio + ancho1][j] = 1
 
 def richardson(A,x,b,N):
 
@@ -259,6 +295,8 @@ def condiciones():
     outlet(wJac, bw, "w")
     centerLine(uJac, bu, "u")
     centerLine(wJac, bw, "w")
+    llenar(uJac, bu, "u")
+    llenar(wJac, bw, "w")
     viga1(uJac, bu, "u")
     viga1(wJac, bw, "w")
 
@@ -278,8 +316,8 @@ for i in range(10):
     wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
     condiciones()
 
-# Mostrar(u)
-# Mostrar(w)
+Mostrar(u)
+Mostrar(w)
 
 #############################################################
 # Matriz de magnitudes
@@ -290,7 +328,7 @@ for j in range(Nxmax):
     for i in range(Nxmax):
         a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
         magn[i][j] = a
-
+print(magn)
 ##############################################################
 # Normalizamos las matrices halladas
 def normalizar():
@@ -301,7 +339,7 @@ def normalizar():
                 u[i][j] = u[i][j] / m
                 w[i][j] = w[i][j] / m
 
-# normalizar()
+normalizar()
 
 ##############################################################
 # Vectores
@@ -316,7 +354,7 @@ vmesh = w
 
 #####################################################
 # Graficar
-plt.imshow(magn)
+# plt.imshow(magn)
 plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.colorbar()
 plt.show()
