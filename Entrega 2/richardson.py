@@ -7,8 +7,8 @@ from numpy import array, zeros, diag, diagflat, dot
 # Valores temporalmente por defecto
 # Distancia entre puntos
 h = 1
-omegaX = 0.00001
-omegaY = 0.01
+omegaX = 0.1
+omegaY = 0.1
 # Dimensiones de la matriz
 Nxmax = 25
 Nymax = 25
@@ -30,7 +30,7 @@ bw = np.zeros(Nxmax * Nymax)
 
 for i in range(Nxmax * Nymax):
   bu[i] = h/8
-  bw[i] = h/8
+  bw[i] = 0
 
 xu0 = np.zeros(Nxmax*Nymax)
 xw0 = np.zeros(Nxmax*Nymax)
@@ -215,7 +215,7 @@ def viga1(m, b, flag):
                 b[i * n + inicio - 1] = 0
             else:
                 j2 = math.ceil(j / Nymax) - 1
-                b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+                b[i * n + inicio - 1] = 2 * (u[i][j2 - 1] - u[i][j2]) / h * h
     # Pared superior viga 1
     f = n - alto1 - 1
     for j in range(inicio, inicio + ancho1):
@@ -303,7 +303,7 @@ def condiciones():
 condiciones()
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(10):
+for i in range(20):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -354,7 +354,7 @@ vmesh = w
 
 #####################################################
 # Graficar
-# plt.imshow(magn)
+plt.imshow(magn)
 plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.colorbar()
 plt.show()

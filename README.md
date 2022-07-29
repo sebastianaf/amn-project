@@ -20,3 +20,6 @@ Es esta implementando la viga 1. Está terminada la pared izquierda y la superio
 
 ## Versión 1.1.0
 Implementación con viga 1 completa
+
+## Versión 1.1.1
+Las vigas tienen mejor comportamiento
