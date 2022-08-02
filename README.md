@@ -23,3 +23,7 @@ Implementación con viga 1 completa
 
 ## Versión 1.1.1
 Las vigas tienen mejor comportamiento
+
+## Versión 1.2.0
+Se corrigieron errores en la forntera superior. La matriz de magnitudes fué corregida, ya que pitágoras no aplica en este caso.
+Para solucionar esto, se sumaron los tamaños de cada vector en u y w, y se saco su promedio.

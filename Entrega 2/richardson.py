@@ -7,8 +7,8 @@ from numpy import array, zeros, diag, diagflat, dot
 # Valores temporalmente por defecto
 # Distancia entre puntos
 h = 1
-omegaX = 0.1
-omegaY = 0.1
+omegaX = 0.01
+omegaY = 0.01
 # Dimensiones de la matriz
 Nxmax = 25
 Nymax = 25
@@ -111,7 +111,7 @@ def surfaceG(m, b, flag):
 
     for i in range(0, n):
         if flag == "u":
-            b[i] = 2 * h * V0
+            b[i] = V0
         else:
             b[i] = 0
         for j in range(0, n * n):
@@ -122,9 +122,8 @@ def surfaceG(m, b, flag):
     if flag == "u":
         for i in range(0, n):
             for j in range(0, n * n):
-                if (i == j + 1 and j < n - 1):
-                    m[i][j] = -1
-                if (j == i + 1 and j < n):
+                m[i][j] = 0
+                if (j == i):
                     m[i][j] = 1
     return m, b
 
@@ -209,7 +208,7 @@ def viga1(m, b, flag):
     n = len(u)
 
     # Pared izquierda viga 1
-    for i in range(n - alto1, n):
+    for i in range(n - alto1 - 1, n):
         for j in range(0, n * n):
             if flag == "u":
                 b[i * n + inicio - 1] = 0
@@ -236,7 +235,7 @@ def viga1(m, b, flag):
 
     if flag == "u":
         # Pared izquierda viga 1
-        for i in range(n - alto1, n):
+        for i in range(n - alto1 - 1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
@@ -256,7 +255,7 @@ def viga1(m, b, flag):
                     m[i * n + inicio + ancho1][j] = 1
     else:
         # Pared izquierda viga 1
-        for i in range(n - alto1, n):
+        for i in range(n - alto1 - 1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
@@ -303,7 +302,7 @@ def condiciones():
 condiciones()
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(20):
+for i in range(50):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -327,8 +326,8 @@ magn = np.zeros((Nxmax, Nxmax))
 for j in range(Nxmax):
     for i in range(Nxmax):
         a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
-        magn[i][j] = a
-print(magn)
+        magn[i][j] = abs(u[i][j]+w[i][j])/2
+Mostrar(magn)
 ##############################################################
 # Normalizamos las matrices halladas
 def normalizar():
@@ -355,6 +354,6 @@ vmesh = w
 #####################################################
 # Graficar
 plt.imshow(magn)
-plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.colorbar()
+plt.quiver(xmesh, ymesh, umesh, vmesh)
 plt.show()
