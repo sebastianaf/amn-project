@@ -7,8 +7,8 @@ from numpy import array, zeros, diag, diagflat, dot
 # Valores temporalmente por defecto
 # Distancia entre puntos
 h = 1
-omegaX = 0.01
-omegaY = 0.01
+omegaX = 0.1
+omegaY = 0.1
 # Dimensiones de la matriz
 Nxmax = 25
 Nymax = 25
@@ -17,8 +17,8 @@ inicio = 7
 alto1 = 7
 ancho1 = 7
 # Viga 2
-inicio2 = 19
-alto2 = 5
+inicio2 = 18
+alto2 = 7
 ancho2 = 7
 V0 = 0.3  # Velocidad inicial
 
@@ -55,6 +55,12 @@ def rellenar(m1, m2):
     for i in range(Nxmax - alto1, Nxmax):
         for j in range(inicio, inicio + ancho1):
             m1[i, j] = 0
+            m2[i, j] = 0
+
+    for i in range(0, alto2):
+        for j in range(inicio2, inicio2 + ancho2):
+            m1[i, j] = 0
+            m2[i, j] = 0
 
 rellenar(u, w)
 
@@ -132,7 +138,7 @@ def InletF(m, b, flag):
     n = len(u)
     for i in range(0, n * n, n):
         if flag == "u":
-            b[i] = 2 * h * V0
+            b[i] = V0
         else:
             b[i] = 0
         for j in range(0, n * n):
@@ -192,6 +198,7 @@ def transform(j):
 def llenar(m, b, flag):
     n = len(u)
     # Rellenar
+    # Viga 1
     for i in range(Nxmax - alto1, Nxmax):
         for k in range(inicio, inicio + ancho1):
             for j in range(0, n * n):
@@ -204,6 +211,19 @@ def llenar(m, b, flag):
         for k in range(inicio, inicio + ancho1):
             b[transformPairToOne(i, k)] = 0
 
+    # Viga 2
+    for i in range(0, alto2):
+        for k in range(inicio2, inicio2 + ancho2):
+            for j in range(0, n * n):
+                j2 = math.ceil(j / Nymax) - 1
+                m[transformPairToOne(i, k)][j] = 0
+                if transformPairToOne(i, k) == j:
+                    m[transformPairToOne(i, k)][j] = 1
+
+    for i in range(0, alto2):
+        for k in range(inicio2, inicio2 + ancho2):
+            b[transformPairToOne(i, k)] = 0
+
 def viga1(m, b, flag):
     n = len(u)
 
@@ -214,15 +234,16 @@ def viga1(m, b, flag):
                 b[i * n + inicio - 1] = 0
             else:
                 j2 = math.ceil(j / Nymax) - 1
-                b[i * n + inicio - 1] = 2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+                b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
     # Pared superior viga 1
     f = n - alto1 - 1
-    for j in range(inicio, inicio + ancho1):
+    for j in range(inicio, inicio + ancho1 + 1):
         if flag == "u":
             b[transformPairToOne(f, j)] = 0
         else:
             j2 = math.ceil(j / Nymax) - 1
-            b[transformPairToOne(f, j)] = -2 * (u[i - 1][j2] - u[i][j2]) / h * h
+            i = n - alto1 - 1
+            b[transformPairToOne(f, j)] = -2 * (u[i - 1][j] - u[i][j]) / h * h
     # Pared derecha viga 1
     for i in range(n - alto1, n):
         for j in range(0, n * n):
@@ -275,6 +296,58 @@ def viga1(m, b, flag):
                 if i * n + inicio + ancho1 == j:
                     m[i * n + inicio + ancho1][j] = 1
 
+def viga2(m, b, flag):
+    n = len(u)
+
+    # Pared izquierda viga 2
+    for i in range(0, alto2 + 1):
+        for j in range(0, n * n):
+            if flag == "u":
+                b[i * n + inicio2 - 1] = 0
+            else:
+                j2 = math.ceil(j / Nymax) - 1
+                print(i, j2)
+                b[i * n + inicio2 - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+    # Pared inferior viga 2
+    f = alto2
+    for j in range(inicio2, inicio2 + ancho2):
+        if flag == "u":
+            b[transformPairToOne(f, j)] = 0
+        else:
+            j2 = math.ceil(j / Nymax) - 1
+            i = alto2
+            b[transformPairToOne(f, j)] = -2 * (u[i + 1][j] - u[i][j]) / h * h
+
+    if flag == "u":
+        # Pared izquierda viga 2
+        for i in range(0, alto2 + 1):
+            for j in range(0, n * n):
+                m[i * n + inicio2 - 1][j] = 0
+                if i * n + inicio2 - 1 == j:
+                    m[i * n + inicio2 - 1][j] = 1
+        # Pared inferior viga 2
+        f = alto2
+        for j in range(inicio2, inicio2 + ancho2):
+            for k in range(0, n * n):
+                m[transformPairToOne(f, j)][k] = 0
+                if transformPairToOne(f, j) == k:
+                    m[transformPairToOne(f, j)][k] = 1
+    else:
+        # Pared izquierda viga 2
+        for i in range(0, alto2 + 1):
+            for j in range(0, n * n):
+                m[i * n + inicio2 - 1][j] = 0
+                if i * n + inicio2 - 1 == j:
+                    m[i * n + inicio2 - 1][j] = 1
+
+        # Pared inferior viga 2
+        f = alto2
+        for j in range(inicio2, inicio2 + ancho2):
+            for k in range(0, n * n):
+                m[transformPairToOne(f, j)][k] = 0
+                if transformPairToOne(f, j) == k:
+                    m[transformPairToOne(f, j)][k] = 1
+
 def richardson(A,x,b,N):
 
   for i in range(N):
@@ -285,24 +358,26 @@ def richardson(A,x,b,N):
 
 uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
 wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
-def condiciones():
-    surfaceG(uJac, bu, "u")
-    surfaceG(wJac, bw, "w")
-    InletF(uJac, bu, "u")
-    InletF(wJac, bw, "w")
-    outlet(uJac, bu, "u")
-    outlet(wJac, bw, "w")
-    centerLine(uJac, bu, "u")
-    centerLine(wJac, bw, "w")
-    llenar(uJac, bu, "u")
-    llenar(wJac, bw, "w")
-    viga1(uJac, bu, "u")
-    viga1(wJac, bw, "w")
+def condiciones(mu, mw, b1, b2):
+    surfaceG(mu, b1, "u")
+    surfaceG(mw, b2, "w")
+    InletF(mu, b1, "u")
+    InletF(mw, b2, "w")
+    outlet(mu, b1, "u")
+    outlet(mw, b2, "w")
+    centerLine(mu, b1, "u")
+    centerLine(mw, b2, "w")
+    llenar(mu, b1, "u")
+    llenar(mw, b2, "w")
+    viga1(mu, b1, "u")
+    viga1(mw, b2, "w")
+    viga2(mu, b1, "u")
+    viga2(mw, b2, "w")
 
-condiciones()
+condiciones(uJac, wJac, bu, bw)
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(50):
+for i in range(1):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -311,9 +386,9 @@ for i in range(50):
             u[i, j] = u[i, j] + omegaX * xu0[it]
             w[i, j] = w[i, j] + omegaY * xw0[it]
             it += 1
-    uJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
-    wJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
-    condiciones()
+    newUJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 1)
+    newWJac = gen_matriz_sis_lineal(Nxmax, u, w, 1, 2)
+    condiciones(newUJac, newWJac, bu, bw)
 
 Mostrar(u)
 Mostrar(w)
@@ -327,7 +402,7 @@ for j in range(Nxmax):
     for i in range(Nxmax):
         a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
         magn[i][j] = abs(u[i][j]+w[i][j])/2
-Mostrar(magn)
+# Mostrar(magn)
 ##############################################################
 # Normalizamos las matrices halladas
 def normalizar():

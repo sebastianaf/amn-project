@@ -27,3 +27,10 @@ Las vigas tienen mejor comportamiento
 ## Versión 1.2.0
 Se corrigieron errores en la forntera superior. La matriz de magnitudes fué corregida, ya que pitágoras no aplica en este caso.
 Para solucionar esto, se sumaron los tamaños de cada vector en u y w, y se saco su promedio.
+
+## Versión 1.2.1
+Se ha implementado la viga dos
+Se solucionaron algunos errores
+- Está en capacidad de ejecutar más iteraciones (antes sólo hacia 30)
+- Ahora es mas rápido en el cálculo
+Aun hay algunos errores. El más relevante es que no funciona la pared izquierda de la viga 2
