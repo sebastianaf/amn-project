@@ -33,4 +33,5 @@ Se ha implementado la viga dos
 Se solucionaron algunos errores
 - Está en capacidad de ejecutar más iteraciones (antes sólo hacia 30)
 - Ahora es mas rápido en el cálculo
-Aun hay algunos errores. El más relevante es que no funciona la pared izquierda de la viga 2
+
+Aún hay algunos errores. El más relevante es que no funciona la pared izquierda de la viga 2
