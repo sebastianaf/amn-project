@@ -228,13 +228,13 @@ def viga1(m, b, flag):
     n = len(u)
 
     # Pared izquierda viga 1
-    for i in range(n - alto1 - 1, n):
+    for i in range(n - alto1, n):
         for j in range(0, n * n):
             if flag == "u":
                 b[i * n + inicio - 1] = 0
             else:
                 j2 = math.ceil(j / Nymax) - 1
-                b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+                b[i * n + inicio - 1] = 2 * (u[i][j2 - 1] - u[i][j2]) / h * h
     # Pared superior viga 1
     f = n - alto1 - 1
     for j in range(inicio, inicio + ancho1 + 1):
@@ -256,7 +256,7 @@ def viga1(m, b, flag):
 
     if flag == "u":
         # Pared izquierda viga 1
-        for i in range(n - alto1 - 1, n):
+        for i in range(n - alto1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
@@ -276,7 +276,7 @@ def viga1(m, b, flag):
                     m[i * n + inicio + ancho1][j] = 1
     else:
         # Pared izquierda viga 1
-        for i in range(n - alto1 - 1, n):
+        for i in range(n - alto1, n):
             for j in range(0, n * n):
                 m[i * n + inicio - 1][j] = 0
                 if i * n + inicio - 1 == j:
@@ -305,9 +305,11 @@ def viga2(m, b, flag):
             if flag == "u":
                 b[i * n + inicio2 - 1] = 0
             else:
-                j2 = math.ceil(j / Nymax) - 1
-                print(i, j2)
+                j2 = Nymax - ancho2 - 1
+                # print(i, j2)
                 b[i * n + inicio2 - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+                break
+
     # Pared inferior viga 2
     f = alto2
     for j in range(inicio2, inicio2 + ancho2):
@@ -377,7 +379,7 @@ def condiciones(mu, mw, b1, b2):
 condiciones(uJac, wJac, bu, bw)
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(1):
+for i in range(10):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -398,10 +400,12 @@ Mostrar(w)
 
 magn = np.zeros((Nxmax, Nxmax))
 
-for j in range(Nxmax):
-    for i in range(Nxmax):
+for j in range(Nxmax - 1):
+    for i in range(Nxmax - 1):
         a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
-        magn[i][j] = abs(u[i][j]+w[i][j])/2
+        magn[i][j] = abs(u[i][j]) + abs(w[i][j])
+        # magn[i][j] = abs(u[i][j]+w[i][j])/2
+        # magn[i][j] = [i][j]
 # Mostrar(magn)
 ##############################################################
 # Normalizamos las matrices halladas
@@ -413,7 +417,7 @@ def normalizar():
                 u[i][j] = u[i][j] / m
                 w[i][j] = w[i][j] / m
 
-normalizar()
+# normalizar()
 
 ##############################################################
 # Vectores

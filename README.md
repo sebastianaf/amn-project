@@ -35,3 +35,8 @@ Se solucionaron algunos errores
 - Ahora es mas rápido en el cálculo
 
 Aún hay algunos errores. El más relevante es que no funciona la pared izquierda de la viga 2
+
+## Versión 1.2.2
+Ya están en funcionamiento todas las vigas (Aún hay errores)
+Se añadieron archivos en blanco para las demás entregas
+Hay un prototipo de la adaptación del código del libro guía
