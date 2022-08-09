@@ -46,3 +46,6 @@ Se corrigió la adaptación del código del libro
 
 ## Versión 1.2.4
 Código final Richardosn y jacobi
+
+## Versión 1.2.5
+Corrección en condición de rontera de la entrega 2. Actualizacipon código libro

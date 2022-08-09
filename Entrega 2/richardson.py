@@ -242,7 +242,7 @@ def viga1(m, b, flag):
                 b[i * n + inicio - 1] = 0
             else:
                 j2 = math.ceil(j / Nymax) - 1
-                b[i * n + inicio - 1] = 2 * (u[i][j2 - 1] - u[i][j2]) / h * h
+                b[i * n + inicio - 1] = -2 * (u[i][j2 - 1] - u[i][j2]) / h * h
     # Pared superior viga 1
     f = n - alto1 - 1
     for j in range(inicio, inicio + ancho1 + 1):
@@ -387,7 +387,7 @@ def condiciones(mu, mw, b1, b2):
 condiciones(uJac, wJac, bu, bw)
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(20):
+for i in range(100):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
