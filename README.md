@@ -40,3 +40,6 @@ Aún hay algunos errores. El más relevante es que no funciona la pared izquierd
 Ya están en funcionamiento todas las vigas (Aún hay errores)
 Se añadieron archivos en blanco para las demás entregas
 Hay un prototipo de la adaptación del código del libro guía
+
+## Versión 1.2.3
+Se corrigió la adaptación del código del libro

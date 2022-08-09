@@ -18,11 +18,11 @@ w = zeros((Nxmax + 1, Nymax + 1), float)  # Vorticity
 V0 = 1.0  # Initial v
 omega = 0.1  # Relaxation param
 IL = 5  # Geometry
-H = 5
-T = 5
-IL2 = 20
-H2 = 5
-T2 = 5
+H = 8
+T = 8
+IL2 = 15
+H2 = 8
+T2 = 8
 h = 1.
 nu = 1.  # Viscosity
 iter = 0  # Number iterations
@@ -78,8 +78,8 @@ def beam2():  # BC for the beam
     for i in range(IL2, IL2 + T2 + 1):
         for j in range(Nymax - H2 - 1, Nymax):
             x=2
-            u[IL2 - 1, j] = 1  # Front
-            u[i, Nymax - H2 - 1] = 1  # Top
+            u[IL2 - 1, j] = 0  # Front
+            u[i, Nymax - H2 - 1] = 0  # Top
 
 def relax():  # Method to relax stream
     beam()  # Reset conditions at beam
@@ -99,7 +99,7 @@ def relax():  # Method to relax stream
 
 m = 0
 borders()
-while (iter <= 300):
+while (iter <= 1000):
     iter += 1
     if iter % 10 == 0:
         print(m)
@@ -127,7 +127,7 @@ def normalizar(u, w):
                 u[i][j] = u[i][j] / m
                 w[i][j] = w[i][j] / m
 
-# normalizar(u,w)
+normalizar(u,w)
 
 def functz(u):  # returns stream flow to plot
     z = u[X, Y]  # for several iterations
