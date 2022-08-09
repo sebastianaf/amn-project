@@ -43,3 +43,6 @@ Hay un prototipo de la adaptación del código del libro guía
 
 ## Versión 1.2.3
 Se corrigió la adaptación del código del libro
+
+## Versión 1.2.4
+Código final Richardosn y jacobi

@@ -20,7 +20,7 @@ ancho1 = 7
 inicio2 = 18
 alto2 = 7
 ancho2 = 7
-V0 = 0.3  # Velocidad inicial
+V0 = 0.2  # Velocidad inicial
 
 u = np.zeros((Nxmax, Nymax), float)
 w = np.zeros((Nxmax, Nymax), float)
@@ -44,10 +44,15 @@ def Mostrar(m):
 
 def inicializar():
     for i in range(Nxmax):
-        V = 0.3
+        V = 0.2
         for j in range(Nymax):
             u[i, j] = round(V - 0.001, 3)
             V = V - 0.001
+    '''
+    for i in range(Nxmax):
+        for j in range(Nymax):
+            u[i, j] = 0.01
+    '''
 
 inicializar()
 
@@ -117,20 +122,14 @@ def surfaceG(m, b, flag):
 
     for i in range(0, n):
         if flag == "u":
-            b[i] = V0
+            # b[i] = V0
+            b[i] = u[1][i]
         else:
             b[i] = 0
         for j in range(0, n * n):
-            # print(f'{i},{j}')
             m[i][j] = 0
             if i == j:
                 m[i][j] = 1
-    if flag == "u":
-        for i in range(0, n):
-            for j in range(0, n * n):
-                m[i][j] = 0
-                if (j == i):
-                    m[i][j] = 1
     return m, b
 
 
@@ -164,30 +163,39 @@ def InletF(m, b, flag):
 def outlet(m, b, flag):
     n = len(u)
     for i in range(n - 1, n * n, n):
-        b[i] = 0
+        i2 = math.ceil(i / Nymax) - 1
+        if flag == "u":
+            b[i] = u[i2][Nxmax - 2]
+        else:
+            b[i] = 0
         for j in range(0, n * n):
             m[i][j] = 0
             if i == j:
                 m[i][j] = 1
-
+    '''
     for i in range(n - 1, n * n, n):
         for j in range(0, n * n):
             if (i + n == j):
                 m[i][j] = 1
             if (i == j + n):
                 m[i][j] = -1
+    '''
 
     return m, b
 
-def centerLine(m,b,flag):
-  n=len(u)
-  for i in range(n*n-n,n*n):
-    b[i] = 0
-    for j in range(0,n*n):
-      m[i][j] = 0
-      if i == j:
-        m[i][j] = 1
-  return m,b
+def centerLine(m, b, flag):
+    n = len(u)
+    for i in range(n * n - n, n * n):
+        i2 = math.ceil(i / Nymax) - 1
+        if flag == "u":
+            b[i] = u[Nymax - 2][i2]
+        else:
+            b[i] = 0
+        for j in range(0, n * n):
+            m[i][j] = 0
+            if i == j:
+                m[i][j] = 1
+    return m, b
 
 def transformPairToOne(i, j):
     return (i+1) * Nxmax - (Nxmax - j)
@@ -245,7 +253,7 @@ def viga1(m, b, flag):
             i = n - alto1 - 1
             b[transformPairToOne(f, j)] = -2 * (u[i - 1][j] - u[i][j]) / h * h
     # Pared derecha viga 1
-    for i in range(n - alto1, n):
+    for i in range(n - alto1 - 1, n):
         for j in range(0, n * n):
             if flag == "u":
                 b[i * n + inicio + ancho1] = 0
@@ -269,7 +277,7 @@ def viga1(m, b, flag):
                 if transformPairToOne(f, j) == k:
                     m[transformPairToOne(f, j)][k] = 1
         # Pared derecha viga 1
-        for i in range(n - alto1, n):
+        for i in range(n - alto1 - 1, n):
             for j in range(0, n * n):
                 m[i * n + inicio + ancho1][j] = 0
                 if i * n + inicio + ancho1 == j:
@@ -290,7 +298,7 @@ def viga1(m, b, flag):
                 if transformPairToOne(f, j) == k:
                     m[transformPairToOne(f, j)][k] = 1
         # Pared derecha viga 1
-        for i in range(n - alto1, n):
+        for i in range(n - alto1 - 1, n):
             for j in range(0, n * n):
                 m[i * n + inicio + ancho1][j] = 0
                 if i * n + inicio + ancho1 == j:
@@ -379,7 +387,7 @@ def condiciones(mu, mw, b1, b2):
 condiciones(uJac, wJac, bu, bw)
 # Mostrar(uJac)
 # Mostrar(wJac)
-for i in range(10):
+for i in range(20):
     xu0 = richardson(uJac, xu0, bu, 1)
     xw0 = richardson(wJac, xw0, bw, 1)
     it = 0
@@ -400,13 +408,14 @@ Mostrar(w)
 
 magn = np.zeros((Nxmax, Nxmax))
 
-for j in range(Nxmax - 1):
-    for i in range(Nxmax - 1):
+for j in range(Nxmax):
+    for i in range(Nxmax):
         a = math.sqrt(pow(u[i][j], 2) + pow(w[i][j], 2))
-        magn[i][j] = abs(u[i][j]) + abs(w[i][j])
+        magn[i][j] = a
+        # magn[i][j] = abs(u[i][j]) + abs(w[i][j])
         # magn[i][j] = abs(u[i][j]+w[i][j])/2
         # magn[i][j] = [i][j]
-# Mostrar(magn)
+Mostrar(magn)
 ##############################################################
 # Normalizamos las matrices halladas
 def normalizar():
@@ -417,7 +426,7 @@ def normalizar():
                 u[i][j] = u[i][j] / m
                 w[i][j] = w[i][j] / m
 
-# normalizar()
+normalizar()
 
 ##############################################################
 # Vectores
