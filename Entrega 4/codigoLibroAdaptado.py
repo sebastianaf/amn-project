@@ -17,12 +17,12 @@ u = zeros((Nxmax + 1, Nymax + 1), float)  # Stream
 w = zeros((Nxmax + 1, Nymax + 1), float)  # Vorticity
 V0 = 1.0  # Initial v
 omega = 0.1  # Relaxation param
-IL = 5  # Geometry
-H = 8
-T = 8
-IL2 = 15
-H2 = 8
-T2 = 8
+IL = 7  # Geometry  Columna
+H = 7   #Fila
+T = 7
+IL2 = 18
+H2 = 7
+T2 = 7
 h = 1.
 nu = 1.  # Viscosity
 iter = 0  # Number iterations
@@ -37,6 +37,17 @@ def Mostrar(m):
             print("\t", valor, end=" ")
         print()
 
+def rellenar():
+    # Viga 1
+    for i in range(IL+1, IL + T):
+        for j in range(0, H+1):
+            u[i, j] = 0
+            w[i, j] = 0
+
+    for i in range(IL2, IL2 + T2):
+        for j in range(Nymax - H2, Nymax):
+            u[i, j] = 0
+            w[i, j] = 0
 
 def borders():  # Initialize stream,vorticity, sets BC
     for i in range(0, Nxmax + 1):  # Initialize stream function
@@ -82,7 +93,8 @@ def beam2():  # BC for the beam
             u[i, Nymax - H2 - 1] = 0  # Top
 
 def relax():  # Method to relax stream
-    beam()  # Reset conditions at beam
+     # Reset conditions at beam
+    beam()
     beam2()
     for i in range(1, Nxmax):  # Relax stream function
         for j in range(1, Nymax):
@@ -99,16 +111,17 @@ def relax():  # Method to relax stream
 
 m = 0
 borders()
-while (iter <= 1000):
+while (iter <= 2100):
     iter += 1
     if iter % 10 == 0:
         print(m)
         m += 1
     relax()
 for i in range(0, Nxmax + 1):
-
+    #v = 0.2
     for j in range(0, Nymax + 1):
-        u[i, j] = u[i, j] / (V0 * h)  # stream in V0h units
+        u[i, j] = u[i, j] / (V0 * h) #round(v-0.001,3)  # stream in V0h units
+        #v=v-0.001
 # u.resize((70,70));
 # w.resize((70,70));
 x = list(range(0, Nxmax - 1))  # to plot lines in x axis
@@ -128,6 +141,7 @@ def normalizar(u, w):
                 w[i][j] = w[i][j] / m
 
 normalizar(u,w)
+rellenar()
 
 def functz(u):  # returns stream flow to plot
     z = u[X, Y]  # for several iterations

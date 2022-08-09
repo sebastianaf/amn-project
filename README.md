@@ -48,4 +48,7 @@ Se corrigió la adaptación del código del libro
 Código final Richardosn y jacobi
 
 ## Versión 1.2.5
-Corrección en condición de rontera de la entrega 2. Actualizacipon código libro
+Corrección en condición de rontera de la entrega 2.
+
+## Versión 1.2.6
+Actualizacipon código libro. Prototipo de NewtonRaphson
